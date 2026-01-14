@@ -115,7 +115,12 @@ app.post('/api/recover', async (req, res) => {
 const indexRoutes = require('./routes/index.routes')
 app.use('/', indexRoutes)
 
-// Servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`)
-})
+// Servidor (Local)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`)
+  })
+}
+
+// Exportar para Vercel
+module.exports = app;
