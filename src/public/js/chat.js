@@ -3,11 +3,14 @@ const chatWidgetHTML = `
     <button id="ai-chat-button" onclick="toggleChat()">💬</button>
     <div id="ai-chat-window">
       <div id="ai-chat-header">
-        <span>wxt-bot (Suporte)</span>
-        <button onclick="toggleChat()" style="background:transparent; border:none; color:black; font-weight:bold; cursor:pointer;">✕</button>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:30px; height:30px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🤖</div>
+          <span>wxt-bot</span>
+        </div>
+        <button onclick="toggleChat()" style="background:transparent; border:none; color:black; font-weight:bold; cursor:pointer; font-size:1.2rem;">✕</button>
       </div>
       <div id="ai-chat-messages">
-        <div class="chat-msg bot">Olá! Eu sou o wxt-bot. Como posso te ajudar hoje?</div>
+        <div class="chat-msg bot">Olá! 👋 Sou o assistente inteligente do produto-wxt. Como posso ajudar você com seu acesso ou dúvidas hoje?</div>
       </div>
       <div id="ai-chat-input-area">
         <input type="text" id="ai-chat-input" placeholder="Digite sua dúvida..." onkeypress="handleChatKey(event)">

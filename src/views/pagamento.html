@@ -145,8 +145,9 @@
       <a href="https://wxt-isps.vercel.app" target="_blank" class="btn" style="background: #444; color: white; font-size: 0.8rem;">ACESSAR GRÁTIS</a>
     </div>
 
-    <div style="margin-top: 15px;">
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
       <a href="/recover" class="btn btn-secondary">Já paguei? Recuperar Acesso</a>
+      <button onclick="acessoAdmin()" style="background: transparent; border: 1px solid #333; color: var(--text-dim); font-size: 0.8rem; padding: 8px;">Acesso ADM</button>
     </div>
 
     <div class="footer">
@@ -211,6 +212,15 @@
     }
 
     checkStatus();
+
+    function acessoAdmin() {
+      const senha = prompt("Insira a senha administrativa:");
+      if (senha === "wilmo") {
+        window.location.href = "/admin";
+      } else if (senha !== null) {
+        alert("Senha incorreta!");
+      }
+    }
 
     document.getElementById('paymentForm').addEventListener('submit', async (e) => {
       e.preventDefault();

@@ -146,13 +146,14 @@
 }
 
 #ai-chat-header {
-  background: var(--primary);
+  background: var(--primary-gradient, var(--primary));
   color: black;
   padding: 15px;
   font-weight: 800;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 #ai-chat-messages {
@@ -177,6 +178,7 @@
   color: white;
   align-self: flex-start;
   border-bottom-left-radius: 2px;
+  border: 1px solid #333;
 }
 
 .chat-msg.user {
