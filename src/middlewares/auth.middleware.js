@@ -8,6 +8,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 exports.verificarAcesso = async (req, res, next) => {
   // 1. Verificar se passou pelo inquérito
   if (!req.session || !req.session.inqueritoOK) {
+    console.log('Acesso negado: inqueritoOK ausente na sessão');
     return res.redirect('/');
   }
 
@@ -50,5 +51,6 @@ exports.verificarInquerito = (req, res, next) => {
   if (req.session && req.session.inqueritoOK) {
     return next();
   }
+  console.log('Acesso negado ao pagamento: inqueritoOK ausente');
   return res.redirect('/');
 };

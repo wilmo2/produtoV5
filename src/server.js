@@ -16,6 +16,7 @@ app.use(helmet({
   crossOriginResourcePolicy: false,
 }))
 app.use(cors())
+app.set('trust proxy', 1) // Confiar no proxy do Render para cookies seguros
 
 // Permitir receber dados de formulário
 app.use(express.urlencoded({ extended: true }))
@@ -26,10 +27,12 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'inquerito_secreto_wxt_2026',
-  resave: false,
+  resave: true,
   saveUninitialized: true,
+  name: 'wxt.sid',
   cookie: { 
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }))
@@ -114,6 +117,23 @@ app.post('/api/recover', async (req, res) => {
 // Rotas do Site
 const indexRoutes = require('./routes/index.routes')
 app.use('/', indexRoutes)
+
+// Rota de Ping para Keep-Alive
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
+// Sistema de Auto-Ping para evitar Sleep do Render (a cada 14 minutos)
+const axios = require('axios');
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
+
+if (RENDER_EXTERNAL_URL) {
+  setInterval(() => {
+    axios.get(`${RENDER_EXTERNAL_URL}/ping`)
+      .then(() => console.log('Keep-alive: Ping enviado com sucesso'))
+      .catch(err => console.error('Keep-alive: Erro ao enviar ping', err.message));
+  }, 14 * 60 * 1000); // 14 minutos
+}
 
 // Servidor
 app.listen(PORT, () => {

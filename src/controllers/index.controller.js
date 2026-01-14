@@ -39,8 +39,15 @@ exports.handleForm = (req, res) => {
     req.session.visitor_id = visitor_id;
   }
 
-  // Após o inquérito, vai para a página de pagamento
-  res.redirect('/pagamento');
+  // Salva a sessão explicitamente antes de redirecionar (importante para o Render)
+  req.session.save((err) => {
+    if (err) {
+      console.error('Erro ao salvar sessão:', err);
+      return res.status(500).send('Erro interno do servidor');
+    }
+    // Após o inquérito, vai para a página de pagamento
+    res.redirect('/pagamento');
+  });
 };
 
 exports.pagamento = (req, res) => {
