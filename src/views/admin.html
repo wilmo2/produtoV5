@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin - Video Downloader</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .admin-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #333; }
+    .receipt-img { width: 100%; border-radius: 8px; margin: 10px 0; cursor: pointer; }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .approve-btn { background: var(--success); color: white; }
+    .whatsapp-link { display: inline-block; margin-bottom: 10px; color: #25d366; text-decoration: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="container">
+      <div class="header">
+        <h2>Acesso Restrito</h2>
+        <p>Insira a senha administrativa</p>
+      </div>
+      <form id="loginForm">
+        <input type="password" id="adminPass" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+      </form>
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="/pagamento" style="color: var(--text-dim); text-decoration: none;">Voltar</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h2>Painel de Aprovação</h2>
+      <p id="pendingCount">Carregando pagamentos...</p>
+    </div>
+
+    <div id="paymentsList"></div>
+
+    <div style="margin-top: 30px;">
+      <button onclick="location.reload()" class="btn btn-secondary">Atualizar Lista</button>
+      <a href="/home" class="btn btn-secondary" style="margin-top: 10px;">Ir para o Site</a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://liwlkstsfmjrpzupniux.supabase.co';
+    const ADMIN_PASS = 'wilmo';
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (document.getElementById('adminPass').value === ADMIN_PASS) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        loadPayments();
+      } else {
+        alert('Senha incorreta!');
+      }
+    });
+
+    async function loadPayments() {
+      const res = await fetch('/api/admin/payments');
+      const data = await res.json();
+      
+      const list = document.getElementById('paymentsList');
+      const count = document.getElementById('pendingCount');
+      list.innerHTML = '';
+      count.innerText = `${data.length} pagamentos pendentes`;
+
+      if (data.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:var(--text-dim);">Nenhum pagamento pendente no momento.</p>';
+        return;
+      }
+
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'admin-card';
+        
+        const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/receipts/${p.receipt_path}`;
+        
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-size:1.1rem;">${p.name}</h3>
+            <span style="font-size:0.8rem; color:var(--text-dim);">${new Date().toLocaleDateString()}</span>
+          </div>
+          <a href="https://wa.me/${p.whatsapp}" target="_blank" class="whatsapp-link">📱 WhatsApp: ${p.whatsapp}</a>
+          <img src="${imageUrl}" class="receipt-img" onclick="window.open(this.src)">
+          <button class="approve-btn" onclick="approvePayment('${p.id}', '${p.visitor_id}', this)">Aprovar Acesso</button>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    async function approvePayment(paymentId, visitorId, btn) {
+      if (!confirm('Deseja aprovar este acesso por 7 dias?')) return;
+      
+      btn.disabled = true;
+      btn.innerText = 'Aprovando...';
+
+      try {
+        const res = await fetch('/api/admin/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_id: paymentId, visitor_id: visitorId })
+        });
+
+        if (res.ok) {
+          alert('Pagamento aprovado com sucesso!');
+          loadPayments();
+        } else {
+          alert('Erro ao aprovar.');
+          btn.disabled = false;
+          btn.innerText = 'Aprovar Acesso';
+        }
+      } catch (err) {
+        alert('Erro de conexão.');
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

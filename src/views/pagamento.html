@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pagamento - produto-wxt</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    .method-card { 
+      background: var(--input-bg); 
+      padding: 15px; 
+      border-radius: 12px; 
+      text-align: center; 
+      cursor: pointer; 
+      border: 2px solid transparent; 
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .method-card.active { border-color: var(--primary); background: rgba(255, 144, 0, 0.1); }
+    .method-card img { width: 100%; max-width: 80px; height: 40px; object-fit: contain; border-radius: 4px; }
+    .payment-details { background: #1a1a1a; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 1px dashed #444; }
+    .payment-details.active { display: block; animation: fadeIn 0.3s; }
+    .status-badge { padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; display: none; }
+    .status-pending { display: block; background: #ff900022; color: #ff9000; border: 1px solid #ff9000; }
+    .status-blocked { display: block; background: #ff444422; color: #ff4444; border: 1px solid #ff4444; }
+    .status-approved { display: block; background: #00c85122; color: #00c851; border: 1px solid #00c851; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .price-highlight {
+      background: rgba(255, 144, 0, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid var(--primary);
+    }
+    .whatsapp-support {
+      background: #25d36622;
+      color: #25d366;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+      margin-top: 10px;
+      border: 1px solid #25d366;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+      </div>
+      <h2>Pagamento</h2>
+      <p style="color: var(--text-dim);">Ative seu acesso premium agora</p>
+    </div>
+
+    <div class="site-message">
+      <b>O site produto-wxt diz:</b>
+      Para continuar e ter acesso ilimitado por 7 dias, realize o pagamento abaixo.
+    </div>
+
+    <div class="price-highlight">
+      <div style="font-size: 0.8rem; color: var(--text-dim);">VALOR DO ACESSO</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">1$ (USD)</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-weight: 600; font-size: 0.9rem;">
+        <span>≈ 63.00 MT</span>
+        <span>≈ 18.50 ZAR</span>
+        <span>≈ 6.00 BRL</span>
+        <span style="color: var(--text-dim); font-size: 0.7rem;">(Outros: Consultar)</span>
+      </div>
+    </div>
+
+    <div id="statusMessage" class="status-badge"></div>
+    
+    <div id="approvedAction" style="display: none; margin-bottom: 20px;">
+      <a href="/home" class="btn" style="background: var(--success); color: white;">ENTRAR NO SITE</a>
+    </div>
+
+    <div id="paymentArea">
+      <p style="margin-bottom: 10px; font-weight: 600; color: var(--text-dim);">Escolha o método:</p>
+      <div class="payment-methods">
+        <div class="method-card" onclick="selectMethod('mpesa')">
+          <img src="https://res.cloudinary.com/dyqjrhofx/image/upload/v1768388218/ocr-app/images/media-1768388218190-373004202_udvean.png" alt="M-Pesa">
+          <span style="font-size: 0.8rem; font-weight: bold;">M-Pesa</span>
+        </div>
+        <div class="method-card" onclick="selectMethod('emola')">
+          <img src="https://res.cloudinary.com/dyqjrhofx/image/upload/v1768388548/ocr-app/images/media-1768388548157-67107117_kljfsx.jpg" alt="e-Mola">
+          <span style="font-size: 0.8rem; font-weight: bold;">e-Mola</span>
+        </div>
+      </div>
+
+      <div id="mpesaDetails" class="payment-details">
+        <p><b>M-Pesa</b></p>
+        <p>Número: <b style="color: var(--primary); font-size: 1.2rem;">857 270 435</b></p>
+        <p>Nome: <b>Wilmo Eugénio Changa</b></p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim);">Transfira <b>63 MT</b> e envie o comprovante abaixo.</p>
+      </div>
+
+      <div id="emolaDetails" class="payment-details">
+        <p><b>e-Mola</b></p>
+        <p>Número: <b style="color: var(--primary); font-size: 1.2rem;">867 300 137</b></p>
+        <p>Nome: <b>Wilmo Eugénio Changa</b></p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim);">Transfira <b>63 MT</b> e envie o comprovante abaixo.</p>
+      </div>
+
+      <form id="paymentForm">
+        <div class="form-group">
+          <label>Seu Nome</label>
+          <input type="text" name="name" placeholder="Como no comprovante" required>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="tel" name="whatsapp" placeholder="Ex: 841234567" required>
+        </div>
+        <div class="form-group">
+          <label>Comprovante (Imagem)</label>
+          <input type="file" name="receipt" accept="image/*" required>
+        </div>
+        <button type="submit" id="submitBtn">Enviar Comprovante</button>
+      </form>
+
+      <div style="margin-top: 20px; text-align: center;">
+        <p style="font-size: 0.85rem; color: var(--text-dim);">Não tem estes métodos ou prefere pagar via <b>PayPal, Binance ou Transferência</b>?</p>
+        <a href="https://wa.me/258857270435" class="whatsapp-support">
+          <span>Falar com Wilmo no WhatsApp</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="promo-card">
+      <h4><span>🚀</span> Conheça o WXT-ISPS</h4>
+      <p>IA, downloads de redes sociais e muito mais. 100% grátis!</p>
+      <a href="https://wxt-isps.vercel.app" target="_blank" class="btn" style="background: #444; color: white; font-size: 0.8rem;">ACESSAR GRÁTIS</a>
+    </div>
+
+    <div style="margin-top: 15px;">
+      <a href="/recover" class="btn btn-secondary">Já paguei? Recuperar Acesso</a>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2026 produto-wxt - Todos os direitos reservados.</p>
+    </div>
+  </div>
+
+  <script>
+    function selectMethod(method) {
+      document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.payment-details').forEach(d => d.classList.remove('active'));
+      
+      if(method === 'mpesa') {
+        document.querySelector('.method-card:nth-child(1)').classList.add('active');
+        document.getElementById('mpesaDetails').classList.add('active');
+      } else {
+        document.querySelector('.method-card:nth-child(2)').classList.add('active');
+        document.getElementById('emolaDetails').classList.add('active');
+      }
+    }
+
+    const visitorId = localStorage.getItem('visitor_id');
+    
+    async function checkStatus() {
+      if (!visitorId) return;
+      
+      try {
+        const res = await fetch(`/api/access/${visitorId}`);
+        const accessData = await res.json();
+        
+        const statusMsg = document.getElementById('statusMessage');
+        const paymentArea = document.getElementById('paymentArea');
+        const approvedAction = document.getElementById('approvedAction');
+
+        if (accessData.access) {
+          statusMsg.innerText = 'ACESSO LIBERADO!';
+          statusMsg.className = 'status-badge status-approved';
+          statusMsg.style.display = 'block';
+          paymentArea.style.display = 'none';
+          approvedAction.style.display = 'block';
+          return;
+        }
+
+        const statusRes = await fetch(`/api/payment/status/${visitorId}`);
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'pending') {
+          statusMsg.innerText = 'PAGAMENTO EM ANÁLISE\nAguarde a aprovação do administrador.';
+          statusMsg.className = 'status-badge status-pending';
+          statusMsg.style.display = 'block';
+          paymentArea.style.display = 'none';
+        } else if (statusData.status === 'none') {
+          statusMsg.style.display = 'none';
+        } else {
+          statusMsg.innerText = 'ACESSO BLOQUEADO\nSeu tempo expirou ou o pagamento não foi validado.';
+          statusMsg.className = 'status-badge status-blocked';
+          statusMsg.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Erro ao verificar status:', err);
+      }
+    }
+
+    checkStatus();
+
+    document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = 'Enviando...';
+
+      const formData = new FormData(e.target);
+      formData.append('visitor_id', visitorId);
+
+      try {
+        const res = await fetch('/api/payment', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Comprovante enviado com sucesso! Aguarde a aprovação manual.');
+          checkStatus();
+        } else {
+          alert('Erro ao enviar. Tente novamente.');
+          btn.disabled = false;
+          btn.innerText = 'Enviar Comprovante';
+        }
+      } catch (err) {
+        alert('Erro de conexão.');
+        btn.disabled = false;
+        btn.innerText = 'Enviar Comprovante';
+      }
+    });
+  </script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Menu Principal - produto-wxt</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .profile-info-card {
+      background: #252525;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      text-align: left;
+      border: 1px solid #333;
+    }
+    .profile-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+    .profile-info-label { color: var(--text-dim); }
+    .profile-info-value { color: var(--text); font-weight: 600; }
+    .days-left {
+      background: var(--primary);
+      color: black;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav" style="background: var(--card-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10;">
+    <div style="font-weight: 800; color: var(--primary); letter-spacing: 1px;">PRODUTO-WXT</div>
+    <div class="nav-menu" style="display: flex; gap: 15px; align-items: center;">
+      <a href="https://wxt-isps.vercel.app" target="_blank" style="text-decoration: none; font-size: 0.7rem; background: #333; padding: 5px 10px; border-radius: 20px; color: var(--primary); font-weight: bold; border: 1px solid var(--primary);">WXT-ISPS 🚀</a>
+      <a href="#perfil" onclick="toggleProfile()" style="text-decoration: none; font-size: 1.2rem;">👤</a>
+    </div>
+  </nav>
+
+  <!-- Modal de Perfil Melhorado -->
+  <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; align-items: center; justify-content: center;">
+    <div class="creator-profile" style="width: 100%; max-width: 400px; position: relative; background: var(--card-bg); border: 1px solid #333;">
+      <button onclick="toggleProfile()" style="position: absolute; top: 15px; right: 15px; width: auto; background: transparent; color: white; font-size: 1.5rem; border: none; cursor: pointer;">✕</button>
+      <div class="creator-photo" style="width: 90px; height: 90px;">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="User">
+      </div>
+      <h3 id="userNameDisplay">Usuário Premium</h3>
+      <p id="userStatus" style="color: var(--success); font-size: 0.8rem; font-weight: bold; margin-bottom: 10px;">✓ ACESSO ATIVO</p>
+      
+      <div class="profile-info-card">
+        <div class="profile-info-item">
+          <span class="profile-info-label">ID do Visitante:</span>
+          <span class="profile-info-value" id="displayVisitorId" style="font-size: 0.6rem;">...</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="profile-info-label">Plano:</span>
+          <span class="profile-info-value">Premium 7 Dias</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="profile-info-label">Tempo Restante:</span>
+          <span class="profile-info-value"><span class="days-left" id="daysRemaining">...</span></span>
+        </div>
+      </div>
+      
+      <div class="contact-list" style="margin-top: 20px;">
+        <a href="https://wa.me/258857270435" class="contact-item">
+          <span>💬 Suporte WhatsApp</span>
+        </a>
+      </div>
+      <button onclick="location.href='/logout'" class="btn btn-secondary" style="margin-top: 20px; font-size: 0.8rem;">Sair da Conta</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+      </div>
+      <h2>Escolha a Plataforma</h2>
+    </div>
+
+    <div class="site-message">
+      <b>O site produto-wxt diz:</b>
+      Aproveite o acesso premium! Selecione uma das plataformas abaixo para começar seus downloads.
+    </div>
+    
+    <div class="menu-grid">
+      <a href="/pagina1" class="menu-card">
+        <div class="menu-card-icon">🔥</div>
+        <div class="menu-card-info">
+          <h3>XNXX Downloader</h3>
+          <p>Busque e baixe vídeos do XNXX</p>
+        </div>
+      </a>
+
+      <a href="/pagina2" class="menu-card" style="border-left-color: #ff8000;">
+        <div class="menu-card-icon">🎬</div>
+        <div class="menu-card-info">
+          <h3>Pornhub Downloader</h3>
+          <p>O melhor do Pornhub em suas mãos</p>
+        </div>
+      </a>
+
+      <a href="/pagina3" class="menu-card" style="border-left-color: #ff0000;">
+        <div class="menu-card-icon">🎥</div>
+        <div class="menu-card-info">
+          <h3>Xvideos Downloader</h3>
+          <p>Downloads rápidos do Xvideos</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Promoção do outro produto -->
+    <div class="promo-card">
+      <h4><span>🚀</span> WXT-ISPS (Grátis)</h4>
+      <p>IA, downloads de redes sociais, upload de mídias, tradução, clima e APKs. Tudo 100% grátis!</p>
+      <a href="https://wxt-isps.vercel.app" target="_blank" class="btn" style="background: #444; color: white; font-size: 0.85rem;">CONHECER AGORA</a>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <a href="/logout" class="btn btn-secondary">Sair da Sessão</a>
+    </div>
+
+    <div class="footer">
+      <p>Focado em Mobile First</p>
+      <p>Desenvolvido por <a href="/criador">wxt-2026-xt</a></p>
+    </div>
+  </div>
+  <script src="/js/chat.js"></script>
+
+  <script>
+    function toggleProfile() {
+      const modal = document.getElementById('profileModal');
+      modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+    }
+    
+    async function loadProfileData() {
+      const vid = localStorage.getItem('visitor_id');
+      if (!vid) return;
+      
+      document.getElementById('displayVisitorId').innerText = vid;
+      
+      try {
+        const res = await fetch(`/api/access/${vid}`);
+        const data = await res.json();
+        
+        if (data.paid_until) {
+          const expiry = new Date(data.paid_until);
+          const now = new Date();
+          const diffTime = Math.abs(expiry - now);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          document.getElementById('daysRemaining').innerText = diffDays + (diffDays === 1 ? ' dia' : ' dias');
+        } else {
+          document.getElementById('daysRemaining').innerText = 'Expirado';
+        }
+      } catch (e) {
+        console.error("Erro ao carregar perfil", e);
+      }
+    }
+    
+    loadProfileData();
+  </script>
+</body>
+</html>

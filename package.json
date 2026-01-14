@@ -1,0 +1,37 @@
+{
+  "name": "projeto",
+  "version": "1.0.0",
+  "description": "Projeto web para renda extra - mobile first",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "Wilmo",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "downvid": "*",
+    "express": "^4.19.2",
+    "express-session": "*",
+    "helmet": "^7.1.0",
+    "mot-ph": "*",
+    "multer": "^1.4.5-lts.1",
+    "nsfwhub": "*",
+    "pornhub.js": "*",
+    "unlimited-ai": "^6.1.0",
+    "xnxx-dl": "*",
+    "xnxxjs": "*",
+    "xvdlvoid": "*",
+    "xvideos-downloader": "*",
+    "xvideos-scraper": "*",
+    "xvideos.js": "*"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

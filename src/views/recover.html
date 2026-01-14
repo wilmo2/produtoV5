@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Recuperar Acesso - Video Downloader</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+      </div>
+      <h2>Recuperar Acesso</h2>
+      <p style="color: var(--text-dim);">Insira seu WhatsApp usado no pagamento</p>
+    </div>
+
+    <form id="recoverForm">
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input type="tel" id="whatsapp" placeholder="Ex: 841234567" required>
+      </div>
+      <button type="submit" id="submitBtn">Verificar Acesso</button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="/pagamento" style="color: var(--primary); text-decoration: none; font-weight: bold;">Voltar para Pagamento</a>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2026 Video Downloader</p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('recoverForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const whatsapp = document.getElementById('whatsapp').value;
+      const btn = document.getElementById('submitBtn');
+      
+      btn.disabled = true;
+      btn.innerText = 'Verificando...';
+
+      try {
+        const res = await fetch('/api/recover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ whatsapp })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          // Atualiza o visitor_id local
+          localStorage.setItem('visitor_id', data.visitor_id);
+          
+          // Em vez de redirecionar direto para /home (que pode falhar se a sessão não estiver sincronizada),
+          // vamos voltar para a página de pagamento que agora sabe lidar com o visitor_id recuperado
+          alert('Acesso localizado! Redirecionando para validação...');
+          window.location.href = '/pagamento';
+        } else {
+          alert('Nenhum pagamento aprovado encontrado para este número.');
+          btn.disabled = false;
+          btn.innerText = 'Verificar Acesso';
+        }
+      } catch (err) {
+        alert('Erro de conexão.');
+        btn.disabled = false;
+        btn.innerText = 'Verificar Acesso';
+      }
+    });
+  </script>
+</body>
+</html>

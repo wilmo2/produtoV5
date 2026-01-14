@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bem-vindo - produto-wxt</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    /* Estilo para o seletor de profissão tipo dropdown moderno */
+    .custom-select-wrapper { position: relative; margin-top: 10px; }
+    .custom-select { 
+      background: var(--input-bg); 
+      padding: 14px; 
+      border-radius: 12px; 
+      border: 1px solid #333; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .custom-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      margin-top: 5px;
+      display: none;
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+    }
+    .custom-option { padding: 12px; border-bottom: 1px solid #252525; transition: 0.2s; }
+    .custom-option:hover { background: var(--primary); color: black; }
+    .custom-option:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+      </div>
+      <h1>produto-wxt</h1>
+      <p style="color: var(--text-dim); margin-top: 5px;">Acesse o melhor conteúdo</p>
+    </div>
+
+    <div class="site-message">
+      <b>O site produto-wxt diz:</b>
+      Seja bem-vindo! Por favor, responda ao breve inquérito abaixo para personalizar sua experiência e liberar o acesso.
+    </div>
+
+    <form action="/inquerito" method="POST" id="inqueritoForm">
+      <h2 style="text-align: left; font-size: 1.2rem; margin-bottom: 10px;">Inquérito Inicial</h2>
+      
+      <input type="hidden" name="visitor_id" id="visitor_id_input">
+
+      <div class="form-group">
+        <label>Você é maior de idade?</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn age-btn" onclick="setAge('sim', this)">Sim, sou maior</button>
+          <button type="button" class="option-btn age-btn" onclick="setAge('nao', this)">Não, sou menor</button>
+        </div>
+        <input type="hidden" name="idade" id="idade_input" required>
+      </div>
+
+      <div class="form-group">
+        <label>Sexo</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn sex-btn" onclick="setSex('masculino', this)">Masculino</button>
+          <button type="button" class="option-btn sex-btn" onclick="setSex('feminino', this)">Feminino</button>
+        </div>
+        <input type="hidden" name="sexo" id="sexo_input" required>
+      </div>
+
+      <div class="form-group">
+        <label>Profissão</label>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" onclick="toggleOptions()">
+            <span id="selected-prof">Escolha sua profissão</span>
+            <span>▼</span>
+          </div>
+          <div class="custom-options" id="prof-options">
+            <div class="custom-option" onclick="selectProf('Estudante')">Estudante</div>
+            <div class="custom-option" onclick="selectProf('Engenheiro')">Engenheiro</div>
+            <div class="custom-option" onclick="selectProf('Médico')">Médico</div>
+            <div class="custom-option" onclick="selectProf('Autônomo')">Autônomo</div>
+            <div class="custom-option" onclick="selectProf('Empresário')">Empresário</div>
+            <div class="custom-option" onclick="selectProf('Outro')">Outro</div>
+          </div>
+        </div>
+        <input type="text" name="profissao" id="profissao_input" placeholder="Ou digite aqui" required style="margin-top: 10px;">
+      </div>
+
+      <button type="submit" style="margin-top: 10px;">Continuar para Acesso</button>
+    </form>
+
+    <div class="promo-card">
+      <h4><span>🚀</span> Conheça o WXT-ISPS</h4>
+      <p>Use IA, baixe vídeos de todas redes sociais, faça upload de mídias, traduza textos, veja o clima e baixe APKs. Tudo em um só lugar!</p>
+      <a href="https://wxt-isps.vercel.app" target="_blank" class="btn" style="background: #444; color: white; font-size: 0.85rem;">ACESSAR 100% GRÁTIS</a>
+    </div>
+
+    <script>
+      function setAge(val, btn) {
+        document.getElementById('idade_input').value = val;
+        document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function setSex(val, btn) {
+        document.getElementById('sexo_input').value = val;
+        document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function toggleOptions() {
+        const opt = document.getElementById('prof-options');
+        opt.style.display = opt.style.display === 'block' ? 'none' : 'block';
+      }
+
+      function selectProf(val) {
+        document.getElementById('selected-prof').innerText = val;
+        document.getElementById('profissao_input').value = val;
+        toggleOptions();
+      }
+
+      async function initVisitor() {
+        let vid = localStorage.getItem('visitor_id');
+        if (!vid) {
+          const res = await fetch('/api/visitor', { method: 'POST' });
+          const data = await res.json();
+          vid = data.visitor_id;
+          localStorage.setItem('visitor_id', vid);
+        }
+        document.getElementById('visitor_id_input').value = vid;
+      }
+      initVisitor();
+    </script>
+
+    <div class="footer">
+      <p>&copy; 2026 <a href="/criador">wxt-2026-xt</a>. Todos os direitos reservados.</p>
+    </div>
+  </div>
+  <script src="/js/chat.js"></script>
+</body>
+</html>
