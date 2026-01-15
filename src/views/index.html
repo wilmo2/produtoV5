@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Bem-vindo - produto-wxt</title>
+  
+  <!-- Meta Tags para SEO e Social Media -->
+  <title>produto-wxt | Acesso Premium 2026</title>
+  <meta name="description" content="Portal exclusivo para busca e download de vídeos premium. Acesse agora as melhores ferramentas.">
+  <meta property="og:title" content="produto-wxt | Acesso Premium">
+  <meta property="og:description" content="Portal exclusivo para busca e download de vídeos premium.">
+  <meta property="og:image" content="https://i.ibb.co/fdLYFS49/logo.png">
+  <meta property="og:url" content="https://produto-wxt.render.com">
+  <link rel="icon" type="image/png" href="https://i.ibb.co/fdLYFS49/logo.png">
+
   <link rel="stylesheet" href="/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,51 +73,6 @@
       box-shadow: 0 0 10px rgba(255, 144, 0, 0.5);
     }
 
-    .custom-select-wrapper { position: relative; margin-top: 10px; }
-    .custom-select { 
-      background: var(--input-bg); 
-      padding: 16px; 
-      border-radius: 14px; 
-      border: 1px solid #333; 
-      cursor: pointer; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-      transition: 0.3s;
-    }
-    .custom-select:hover { border-color: #444; }
-    
-    .custom-options {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 14px;
-      margin-top: 8px;
-      display: none;
-      z-index: 100;
-      max-height: 220px;
-      overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      animation: fadeIn 0.2s ease-out;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .custom-option { 
-      padding: 14px; 
-      border-bottom: 1px solid #252525; 
-      transition: 0.2s; 
-      font-size: 0.95rem;
-    }
-    .custom-option:hover { background: var(--primary); color: black; font-weight: 600; }
-    .custom-option:last-child { border-bottom: none; }
-
     .submit-btn {
       background: var(--primary-gradient);
       color: black;
@@ -118,42 +82,40 @@
       padding: 18px;
       margin-top: 10px;
       box-shadow: 0 10px 20px rgba(255, 144, 0, 0.2);
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 25px rgba(255, 144, 0, 0.3);
-    }
-
-    .option-btn {
-      padding: 16px;
+      width: 100%;
+      border: none;
       border-radius: 14px;
-      font-size: 0.95rem;
+      cursor: pointer;
     }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 12px;
+    .privacy-banner {
+      background: rgba(0,0,0,0.8);
+      padding: 15px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #333;
       font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
+
+    .privacy-banner a { color: var(--primary); text-decoration: underline; }
+    .accept-btn { background: var(--primary); color: black; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="hero-section">
       <div class="logo-container">
-        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo" style="width: 80px;">
       </div>
       <div class="welcome-badge">Acesso Exclusivo 2026</div>
       <h1>produto-wxt</h1>
       <p style="color: var(--text-dim); margin-top: 5px; font-size: 0.9rem;">Personalize sua experiência em segundos</p>
-    </div>
-
-    <div class="site-message">
-      <b>Mensagem do Sistema</b>
-      Responda ao inquérito rápido para liberar o catálogo completo de vídeos e ferramentas.
     </div>
 
     <div class="inquiry-card">
@@ -163,7 +125,7 @@
         <div class="step-dot" id="dot3"></div>
       </div>
 
-      <form action="/inquerito" method="POST" id="inqueritoForm" style="background: transparent; padding: 0; box-shadow: none;">
+      <form action="/inquerito" method="POST" id="inqueritoForm">
         <input type="hidden" name="visitor_id" id="visitor_id_input">
 
         <div class="form-group">
@@ -186,88 +148,55 @@
 
         <div class="form-group" style="margin-top: 20px;">
           <label>Sua Ocupação</label>
-          <div class="custom-select-wrapper">
-            <div class="custom-select" onclick="toggleOptions()">
-              <span id="selected-prof" style="color: var(--text-dim);">Selecione uma opção</span>
-              <span style="color: var(--primary);">▼</span>
-            </div>
-            <div class="custom-options" id="prof-options">
-              <div class="custom-option" onclick="selectProf('Estudante')">Estudante</div>
-              <div class="custom-option" onclick="selectProf('Engenheiro')">Engenheiro</div>
-              <div class="custom-option" onclick="selectProf('Médico')">Médico</div>
-              <div class="custom-option" onclick="selectProf('Autônomo')">Autônomo</div>
-              <div class="custom-option" onclick="selectProf('Empresário')">Empresário</div>
-              <div class="custom-option" onclick="selectProf('Outro')">Outro</div>
-            </div>
-          </div>
-          <input type="text" name="profissao" id="profissao_input" placeholder="Ou digite sua profissão" required style="margin-top: 12px; border-radius: 14px;">
+          <input type="text" name="profissao" id="profissao_input" placeholder="Digite sua profissão" required style="width: 100%; padding: 15px; border-radius: 14px; background: #222; border: 1px solid #333; color: white;">
         </div>
 
         <button type="submit" class="submit-btn" style="margin-top: 25px;">Liberar Acesso Agora</button>
       </form>
     </div>
 
-    <div class="promo-card">
-      <h4><span>🚀</span> WXT-ISPS</h4>
-      <p>IA avançada, downloads ilimitados e ferramentas premium. Tudo grátis!</p>
-      <a href="https://wxt-isps.vercel.app" target="_blank" class="btn" style="background: #333; color: white; font-size: 0.85rem; border: 1px solid #444;">EXPLORAR GRÁTIS</a>
-    </div>
-
-    <script>
-      function updateDots() {
-        const age = document.getElementById('idade_input').value;
-        const sex = document.getElementById('sexo_input').value;
-        const prof = document.getElementById('profissao_input').value;
-        
-        document.getElementById('dot1').className = age ? 'step-dot active' : 'step-dot';
-        document.getElementById('dot2').className = sex ? 'step-dot active' : 'step-dot';
-        document.getElementById('dot3').className = prof ? 'step-dot active' : 'step-dot';
-      }
-
-      function setAge(val, btn) {
-        document.getElementById('idade_input').value = val;
-        document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        updateDots();
-      }
-
-      function setSex(val, btn) {
-        document.getElementById('sexo_input').value = val;
-        document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        updateDots();
-      }
-
-      function toggleOptions() {
-        const opt = document.getElementById('prof-options');
-        opt.style.display = opt.style.display === 'block' ? 'none' : 'block';
-      }
-
-      function selectProf(val) {
-        document.getElementById('selected-prof').innerText = val;
-        document.getElementById('selected-prof').style.color = 'white';
-        document.getElementById('profissao_input').value = val;
-        toggleOptions();
-        updateDots();
-      }
-
-      async function initVisitor() {
-        let vid = localStorage.getItem('visitor_id');
-        if (!vid) {
-          const res = await fetch('/api/visitor', { method: 'POST' });
-          const data = await res.json();
-          vid = data.visitor_id;
-          localStorage.setItem('visitor_id', vid);
-        }
-        document.getElementById('visitor_id_input').value = vid;
-      }
-      initVisitor();
-    </script>
-
-    <div class="footer" style="margin-top: 30px; opacity: 0.6;">
-      <p>&copy; 2026 <a href="/criador" style="color: var(--primary); text-decoration: none;">wxt-2026-xt</a>. Todos os direitos reservados.</p>
+    <div class="footer" style="text-align: center; margin-top: 30px; opacity: 0.6;">
+      <p>&copy; 2026 <a href="/criador" style="color: var(--primary); text-decoration: none;">wxt-2026-xt</a>. <a href="/privacidade" style="color: white;">Privacidade</a></p>
     </div>
   </div>
-  <script src="/js/chat.js"></script>
+
+  <div id="privacy-banner" class="privacy-banner">
+    <span>Nós usamos cookies para melhorar sua experiência. Ao continuar, você aceita nossa <a href="/privacidade">Política de Privacidade</a>.</span>
+    <button class="accept-btn" onclick="acceptPrivacy()">Aceitar</button>
+  </div>
+
+  <script>
+    function acceptPrivacy() {
+      localStorage.setItem('privacy_accepted', 'true');
+      document.getElementById('privacy-banner').style.display = 'none';
+    }
+    if (localStorage.getItem('privacy_accepted')) {
+      document.getElementById('privacy-banner').style.display = 'none';
+    }
+
+    function setAge(val, btn) {
+      document.getElementById('idade_input').value = val;
+      document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function setSex(val, btn) {
+      document.getElementById('sexo_input').value = val;
+      document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    async function initVisitor() {
+      let vid = localStorage.getItem('visitor_id');
+      if (!vid) {
+        const res = await fetch('/api/visitor', { method: 'POST' });
+        const data = await res.json();
+        vid = data.visitor_id;
+        localStorage.setItem('visitor_id', vid);
+      }
+      document.getElementById('visitor_id_input').value = vid;
+    }
+    initVisitor();
+  </script>
 </body>
 </html>

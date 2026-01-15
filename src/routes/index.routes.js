@@ -3,6 +3,7 @@ const router = express.Router()
 
 const auth = require('../middlewares/auth.middleware')
 const indexController = require('../controllers/index.controller')
+const path = require('path')
 
 // Inquérito (LIVRE)
 router.get('/', indexController.home)
@@ -23,6 +24,8 @@ router.get('/pagina3', auth.verificarAcesso, indexController.pagina3)
 
 // Página do Criador (LIVRE)
 router.get('/criador', indexController.criador)
+router.get('/privacidade', (req, res) => res.sendFile(path.join(__dirname, '../views/privacidade.html')))
+router.get('/gratis', (req, res) => res.sendFile(path.join(__dirname, '../views/gratis.html')))
 
 // Logout
 router.get('/logout', (req, res) => {
