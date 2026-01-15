@@ -7,28 +7,28 @@ exports.home = (req, res) => {
   res.sendFile(path.join(__dirname, '../views/index.html'))
 }
 
+/*
+// Receber formulário e redirecionar
+exports.handleForm = (req, res) => {
+  const { idade, sexo, profissao } = req.body
+
+  console.log('Dados recebidos:')
+  console.log({ idade, sexo, profissao })
+
+  res.redirect('/home')
+}
+*/
+
+
 exports.handleForm = (req, res) => {
   const { idade, sexo, profissao, visitor_id } = req.body;
 
-  // Validação no servidor (fallback caso o JS do front falhe)
   if (!idade || !sexo || !profissao) {
-    return res.status(400).send(`
-      <div style="font-family: sans-serif; text-align: center; padding: 50px; background: #0f0f0f; color: white; height: 100vh;">
-        <h2 style="color: #ff9000;">Campos Obrigatórios</h2>
-        <p>Todos os campos do inquérito são obrigatórios para continuar.</p>
-        <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #ff9000; color: black; text-decoration: none; border-radius: 8px; font-weight: bold;">Voltar e Preencher</a>
-      </div>
-    `);
+    return res.status(400).send('Todos os campos são obrigatórios.');
   }
 
   if (idade !== 'sim') {
-    return res.status(403).send(`
-      <div style="font-family: sans-serif; text-align: center; padding: 50px; background: #0f0f0f; color: white; height: 100vh;">
-        <h2 style="color: #ff4444;">Acesso Negado</h2>
-        <p>Você precisa ser maior de idade para acessar este site.</p>
-        <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #333; color: white; text-decoration: none; border-radius: 8px;">Voltar</a>
-      </div>
-    `);
+    return res.send('Você precisa ser maior de idade para acessar este site.');
   }
 
   // Marca que passou pelo inquérito
@@ -43,7 +43,7 @@ exports.handleForm = (req, res) => {
   req.session.save((err) => {
     if (err) {
       console.error('Erro ao salvar sessão:', err);
-      return res.status(500).send('Erro interno do servidor ao processar sessão.');
+      return res.status(500).send('Erro interno do servidor');
     }
     // Após o inquérito, vai para a página de pagamento
     res.redirect('/pagamento');
@@ -51,6 +51,8 @@ exports.handleForm = (req, res) => {
 };
 
 exports.pagamento = (req, res) => {
+  // Se o cliente enviou um visitor_id via query (opcional) ou se já temos no localStorage (lidado no front)
+  // Aqui apenas servimos o arquivo, a lógica de sessão será reforçada via API
   res.sendFile(path.join(__dirname, '../views/pagamento.html'))
 }
 
@@ -61,6 +63,8 @@ exports.admin = (req, res) => {
 exports.recover = (req, res) => {
   res.sendFile(path.join(__dirname, '../views/recover.html'))
 }
+
+
 
 // Tela principal
 exports.mainPage = (req, res) => {

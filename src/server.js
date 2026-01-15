@@ -4,225 +4,138 @@ const express = require('express')
 const helmet = require('helmet')
 const cors = require('cors')
 const path = require('path')
-const rateLimit = require('express-rate-limit')
-const { createClient } = require('@supabase/supabase-js')
-const multer = require('multer')
-const crypto = require('crypto')
-const axios = require('axios')
-
-
 
 const app = express()
 
-// Configurações de Ambiente
+// Porta de teste
 const PORT = process.env.PORT || 4000
-const isProd = process.env.NODE_ENV === 'production'
 
-// 1. Rate Limiting - Proteção contra DoS e Brute Force
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Limite de 100 requisições por IP
-  message: 'Muitas requisições vindas deste IP, por favor tente novamente após 15 minutos.'
-})
-app.use('/api/', limiter)
-
-// 2. Middlewares de segurança (Helmet com CSP)
+// Middlewares de segurança
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      imgSrc: ["'self'", "data:", "https://i.ibb.co", "https://*.supabase.co", "https://*.xnxx-cdn.com", "https://*.phncdn.com"],
-      connectSrc: ["'self'", "https://*.supabase.co", "https://*.vercel.app"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  },
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: false,
 }))
-
 app.use(cors())
-app.set('trust proxy', 1)
+app.set('trust proxy', 1) // Confiar no proxy do Render para cookies seguros
 
-// 3. Configuração de Sessão Segura
+// Permitir receber dados de formulário
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+
+// Arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  name: '__Host-wxt.sid', // Prefixo de segurança para cookies
+  secret: process.env.SESSION_SECRET || 'inquerito_secreto_wxt_2026',
+  resave: true,
+  saveUninitialized: true,
+  name: 'wxt.sid',
   cookie: { 
-    secure: isProd,
-    httpOnly: true,
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }))
 
-app.use(express.urlencoded({ extended: true, limit: '10kb' }))
-app.use(express.json({ limit: '10kb' }))
-app.use(express.static(path.join(__dirname, 'public')))
+// Supabase Client para API
+const { createClient } = require('@supabase/supabase-js');
+const multer = require('multer');
+const crypto = require('crypto');
+const upload = multer({ storage: multer.memoryStorage() });
 
-// 4. Supabase Client Seguro
-const SUPABASE_URL = process.env.SUPABASE_URL
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error('ERRO CRÍTICO: Credenciais do Supabase não configuradas no .env');
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-
-// 5. Upload Seguro com Multer
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Apenas imagens (JPG, PNG) são permitidas.'));
-    }
-  }
-});
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://liwlkstsfmjrpzupniux.supabase.co';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpd2xrc3RzZm1qcnB6dXBuaXV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODMxMjA4NiwiZXhwIjoyMDgzODg4MDg2fQ.z6cMtMwOjYQqsjrFcKTsmmBQD0qL9rrfLhQRGSAK17g';
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // API de Pagamento Integrada
 app.post('/api/visitor', async (req, res) => {
-  try {
-    const visitor_id = crypto.randomUUID();
-    await supabase.from('visitors').insert({ id: visitor_id, status: 'free', paid_until: null });
-    res.json({ visitor_id });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao criar visitante' });
-  }
+  const visitor_id = crypto.randomUUID();
+  await supabase.from('visitors').insert({ id: visitor_id, status: 'free', paid_until: null });
+  res.json({ visitor_id });
 });
 
 app.get('/api/access/:id', async (req, res) => {
   const { id } = req.params;
-  if (req.session) req.session.visitor_id = id;
-
-  try {
-    const { data: visitor } = await supabase.from('visitors').select('status, paid_until').eq('id', id).single();
-    if (!visitor) return res.json({ access: false });
-    
-    const now = new Date();
-    const paidUntil = visitor.paid_until ? new Date(visitor.paid_until) : null;
-    const access = visitor.status === 'paid' && paidUntil && paidUntil > now;
-    
-    res.json({ access, paid_until: visitor.paid_until });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao verificar acesso' });
+  
+  // Sincroniza o visitor_id com a sessão do servidor
+  if (req.session) {
+    req.session.visitor_id = id;
   }
+
+  const { data: visitor } = await supabase.from('visitors').select('status, paid_until').eq('id', id).single();
+  if (!visitor) return res.json({ access: false });
+  
+  const now = new Date();
+  const paidUntil = visitor.paid_until ? new Date(visitor.paid_until) : null;
+  const access = visitor.status === 'paid' && paidUntil && paidUntil > now;
+  
+  res.json({ access, paid_until: visitor.paid_until });
 });
 
 app.get('/api/payment/status/:visitor_id', async (req, res) => {
   const { visitor_id } = req.params;
-  try {
-    const { data } = await supabase.from('payment_requests').select('status').eq('visitor_id', visitor_id).order('created_at', { ascending: false }).limit(1).single();
-    res.json({ status: data ? data.status : 'none' });
-  } catch (error) {
-    res.json({ status: 'none' });
-  }
+  const { data } = await supabase.from('payment_requests').select('status').eq('visitor_id', visitor_id).order('created_at', { ascending: false }).limit(1).single();
+  res.json({ status: data ? data.status : 'none' });
 });
 
 app.post('/api/payment', upload.single('receipt'), async (req, res) => {
   const { name, whatsapp, visitor_id } = req.body;
   if (!req.file) return res.status(400).json({ error: 'Comprovante obrigatório' });
-  
-  try {
-    const fileName = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}_${req.file.originalname}`;
-    const { error: uploadError } = await supabase.storage.from('receipts').upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
-    
-    if (uploadError) throw uploadError;
-
-    await supabase.from('payment_requests').insert({ 
-      visitor_id, 
-      name, 
-      whatsapp: whatsapp.replace(/\D/g, ''), 
-      receipt_path: fileName, 
-      status: 'pending' 
-    });
-    res.json({ ok: true });
-  } catch (error) {
-    console.error('Erro no upload:', error);
-    res.status(500).json({ error: 'Falha ao processar pagamento' });
-  }
+  const fileName = `${Date.now()}_${req.file.originalname}`;
+  await supabase.storage.from('receipts').upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
+  await supabase.from('payment_requests').insert({ visitor_id, name, whatsapp: whatsapp.replace(/\D/g, ''), receipt_path: fileName, status: 'pending' });
+  res.json({ ok: true });
 });
 
-// Middleware de Proteção Admin (Simples para este projeto)
-const adminAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader === `Bearer ${process.env.ADMIN_PASSWORD}`) {
-    return next();
-  }
-  res.status(401).json({ error: 'Não autorizado' });
-};
-
-app.get('/api/admin/payments', adminAuth, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('payment_requests').select('id, name, whatsapp, visitor_id, receipt_path').eq('status', 'pending');
-    if (error) throw error;
-    res.json(data || []);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar pagamentos' });
-  }
+app.get('/api/admin/payments', async (req, res) => {
+  const { data, error } = await supabase.from('payment_requests').select('id, name, whatsapp, visitor_id, receipt_path').eq('status', 'pending');
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
 });
 
-app.post('/api/admin/approve', adminAuth, async (req, res) => {
+app.post('/api/admin/approve', async (req, res) => {
   const { payment_id, visitor_id } = req.body;
-  try {
-    await supabase.from('payment_requests').update({ status: 'approved' }).eq('id', payment_id);
-    const paidUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    
-    const { data: visitor } = await supabase.from('visitors').select('id').eq('id', visitor_id).single();
-    if (!visitor) {
-      await supabase.from('visitors').insert({ id: visitor_id, status: 'paid', paid_until: paidUntil.toISOString() });
-    } else {
-      await supabase.from('visitors').update({ status: 'paid', paid_until: paidUntil.toISOString() }).eq('id', visitor_id);
-    }
-    res.json({ ok: true });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao aprovar pagamento' });
+  await supabase.from('payment_requests').update({ status: 'approved' }).eq('id', payment_id);
+  const paidUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const { data: visitor } = await supabase.from('visitors').select('id').eq('id', visitor_id).single();
+  if (!visitor) {
+    await supabase.from('visitors').insert({ id: visitor_id, status: 'paid', paid_until: paidUntil.toISOString() });
+  } else {
+    await supabase.from('visitors').update({ status: 'paid', paid_until: paidUntil.toISOString() }).eq('id', visitor_id);
   }
+  res.json({ ok: true });
 });
 
 app.post('/api/recover', async (req, res) => {
   let { whatsapp } = req.body;
   if (!whatsapp) return res.json({ ok: false });
-  try {
-    const { data: payment } = await supabase.from('payment_requests').select('visitor_id').eq('whatsapp', whatsapp.replace(/\D/g, '')).eq('status', 'approved').order('created_at', { ascending: false }).limit(1).single();
-    if (!payment) return res.json({ ok: false });
-    res.json({ ok: true, visitor_id: payment.visitor_id });
-  } catch (error) {
-    res.json({ ok: false });
-  }
+  const { data: payment } = await supabase.from('payment_requests').select('visitor_id').eq('whatsapp', whatsapp.replace(/\D/g, '')).eq('status', 'approved').order('created_at', { ascending: false }).limit(1).single();
+  if (!payment) return res.json({ ok: false });
+  res.json({ ok: true, visitor_id: payment.visitor_id });
 });
 
 // Rotas do Site
 const indexRoutes = require('./routes/index.routes')
 app.use('/', indexRoutes)
 
-app.get('/ping', (req, res) => res.send('pong'));
-
-// Keep-Alive
-const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
-if (RENDER_EXTERNAL_URL) {
-  setInterval(() => {
-    axios.get(`${RENDER_EXTERNAL_URL}/ping`).catch(() => {});
-  }, 14 * 60 * 1000);
-}
-
-// 6. Middleware Global de Erro
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: isProd ? 'Ocorreu um erro interno no servidor.' : err.message 
-  });
+// Rota de Ping para Keep-Alive
+app.get('/ping', (req, res) => {
+  res.send('pong');
 });
 
+// Sistema de Auto-Ping para evitar Sleep do Render (a cada 14 minutos)
+const axios = require('axios');
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
+
+if (RENDER_EXTERNAL_URL) {
+  setInterval(() => {
+    axios.get(`${RENDER_EXTERNAL_URL}/ping`)
+      .then(() => console.log('Keep-alive: Ping enviado com sucesso'))
+      .catch(err => console.error('Keep-alive: Erro ao enviar ping', err.message));
+  }, 14 * 60 * 1000); // 14 minutos
+}
+
+// Servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 })
