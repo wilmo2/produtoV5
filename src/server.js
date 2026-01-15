@@ -10,6 +10,8 @@ const multer = require('multer')
 const crypto = require('crypto')
 const axios = require('axios')
 
+
+
 const app = express()
 
 // Configurações de Ambiente
