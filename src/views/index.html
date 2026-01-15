@@ -52,6 +52,8 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       border: 1px solid #252525;
       margin-bottom: 20px;
+      position: relative;
+      z-index: 10;
     }
 
     .step-indicator {
@@ -89,22 +91,57 @@
     }
 
     .privacy-banner {
-      background: rgba(0,0,0,0.8);
-      padding: 15px;
+      background: rgba(0,0,0,0.95);
+      padding: 20px;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 1000;
+      z-index: 9999;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 15px;
       align-items: center;
-      border-top: 1px solid #333;
-      font-size: 0.85rem;
+      border-top: 2px solid var(--primary);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .privacy-banner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+        padding: 15px 40px;
+      }
     }
 
     .privacy-banner a { color: var(--primary); text-decoration: underline; }
-    .accept-btn { background: var(--primary); color: black; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .accept-btn { 
+      background: var(--primary); 
+      color: black; 
+      border: none; 
+      padding: 12px 30px; 
+      border-radius: 8px; 
+      font-weight: 800; 
+      cursor: pointer; 
+      min-width: 150px;
+      text-transform: uppercase;
+    }
+
+    .error-msg {
+      color: #ff4444;
+      font-size: 0.8rem;
+      margin-top: 5px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .option-btn.active {
+      background: var(--primary) !important;
+      color: black !important;
+      border-color: var(--primary) !important;
+    }
   </style>
 </head>
 <body>
@@ -125,7 +162,7 @@
         <div class="step-dot" id="dot3"></div>
       </div>
 
-      <form action="/inquerito" method="POST" id="inqueritoForm">
+      <form action="/inquerito" method="POST" id="inqueritoForm" onsubmit="return validateForm(event)">
         <input type="hidden" name="visitor_id" id="visitor_id_input">
 
         <div class="form-group">
@@ -134,7 +171,8 @@
             <button type="button" class="option-btn age-btn" onclick="setAge('sim', this)">Sou Maior</button>
             <button type="button" class="option-btn age-btn" onclick="setAge('nao', this)">Sou Menor</button>
           </div>
-          <input type="hidden" name="idade" id="idade_input" required>
+          <input type="hidden" name="idade" id="idade_input">
+          <div id="error-idade" class="error-msg">Por favor, selecione sua idade.</div>
         </div>
 
         <div class="form-group" style="margin-top: 20px;">
@@ -143,12 +181,14 @@
             <button type="button" class="option-btn sex-btn" onclick="setSex('masculino', this)">Masculino</button>
             <button type="button" class="option-btn sex-btn" onclick="setSex('feminino', this)">Feminino</button>
           </div>
-          <input type="hidden" name="sexo" id="sexo_input" required>
+          <input type="hidden" name="sexo" id="sexo_input">
+          <div id="error-sexo" class="error-msg">Por favor, selecione seu gênero.</div>
         </div>
 
         <div class="form-group" style="margin-top: 20px;">
           <label>Sua Ocupação</label>
-          <input type="text" name="profissao" id="profissao_input" placeholder="Digite sua profissão" required style="width: 100%; padding: 15px; border-radius: 14px; background: #222; border: 1px solid #333; color: white;">
+          <input type="text" name="profissao" id="profissao_input" placeholder="Digite sua profissão" style="width: 100%; padding: 15px; border-radius: 14px; background: #222; border: 1px solid #333; color: white;">
+          <div id="error-profissao" class="error-msg">Por favor, digite sua profissão.</div>
         </div>
 
         <button type="submit" class="submit-btn" style="margin-top: 25px;">Liberar Acesso Agora</button>
@@ -162,7 +202,7 @@
 
   <div id="privacy-banner" class="privacy-banner">
     <span>Nós usamos cookies para melhorar sua experiência. Ao continuar, você aceita nossa <a href="/privacidade">Política de Privacidade</a>.</span>
-    <button class="accept-btn" onclick="acceptPrivacy()">Aceitar</button>
+    <button class="accept-btn" onclick="acceptPrivacy()">Aceitar e Continuar</button>
   </div>
 
   <script>
@@ -170,31 +210,73 @@
       localStorage.setItem('privacy_accepted', 'true');
       document.getElementById('privacy-banner').style.display = 'none';
     }
-    if (localStorage.getItem('privacy_accepted')) {
-      document.getElementById('privacy-banner').style.display = 'none';
-    }
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('privacy_accepted')) {
+        document.getElementById('privacy-banner').style.display = 'none';
+      }
+    });
 
     function setAge(val, btn) {
       document.getElementById('idade_input').value = val;
       document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.getElementById('error-idade').style.display = 'none';
     }
 
     function setSex(val, btn) {
       document.getElementById('sexo_input').value = val;
       document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.getElementById('error-sexo').style.display = 'none';
+    }
+
+    function validateForm(event) {
+      let valid = true;
+      const idade = document.getElementById('idade_input').value;
+      const sexo = document.getElementById('sexo_input').value;
+      const profissao = document.getElementById('profissao_input').value.trim();
+
+      if (!idade) {
+        document.getElementById('error-idade').style.display = 'block';
+        valid = false;
+      }
+      if (!sexo) {
+        document.getElementById('error-sexo').style.display = 'block';
+        valid = false;
+      }
+      if (!profissao) {
+        document.getElementById('error-profissao').style.display = 'block';
+        valid = false;
+      }
+
+      if (!valid) {
+        event.preventDefault();
+        return false;
+      }
+
+      if (idade === 'nao') {
+        alert('Você precisa ser maior de idade para acessar este site.');
+        event.preventDefault();
+        return false;
+      }
+
+      return true;
     }
 
     async function initVisitor() {
-      let vid = localStorage.getItem('visitor_id');
-      if (!vid) {
-        const res = await fetch('/api/visitor', { method: 'POST' });
-        const data = await res.json();
-        vid = data.visitor_id;
-        localStorage.setItem('visitor_id', vid);
+      try {
+        let vid = localStorage.getItem('visitor_id');
+        if (!vid) {
+          const res = await fetch('/api/visitor', { method: 'POST' });
+          const data = await res.json();
+          vid = data.visitor_id;
+          localStorage.setItem('visitor_id', vid);
+        }
+        document.getElementById('visitor_id_input').value = vid;
+      } catch (e) {
+        console.error('Erro ao inicializar visitante:', e);
       }
-      document.getElementById('visitor_id_input').value = vid;
     }
     initVisitor();
   </script>
