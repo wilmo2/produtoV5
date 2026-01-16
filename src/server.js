@@ -26,7 +26,7 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'inquerito_secreto_wxt_2026',
+  secret: process.env.SESSION_SECRET || 'wilmo',
   resave: true,
   saveUninitialized: true,
   name: 'wxt.sid',
@@ -43,8 +43,8 @@ const multer = require('multer');
 const crypto = require('crypto');
 const upload = multer({ storage: multer.memoryStorage() });
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://liwlkstsfmjrpzupniux.supabase.co';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpd2xrc3RzZm1qcnB6dXBuaXV4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODMxMjA4NiwiZXhwIjoyMDgzODg4MDg2fQ.z6cMtMwOjYQqsjrFcKTsmmBQD0qL9rrfLhQRGSAK17g';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // API de Pagamento Integrada

@@ -24,6 +24,10 @@ router.get('/pagina3', auth.verificarAcesso, indexController.pagina3)
 // Página do Criador (LIVRE)
 router.get('/criador', indexController.criador)
 
+// Página de Produtos Grátis (LIVRE após inquérito)
+router.get('/produtos-gratis', auth.verificarInquerito, indexController.produtosGratis)
+router.get('/api/generate-key', indexController.generateKey)
+
 // Logout
 router.get('/logout', (req, res) => {
   req.session.destroy();

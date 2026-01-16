@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Produtos Grátis - produto-wxt</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .key-display {
+      background: #1a1a1a;
+      border: 2px dashed var(--primary);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 20px 0;
+      font-family: monospace;
+      font-size: 1.5rem;
+      color: var(--primary);
+      display: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .key-display:hover::after {
+      content: 'Clique para copiar';
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: black;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .info-box {
+      background: rgba(255, 144, 0, 0.1);
+      border: 1px solid var(--primary);
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/fdLYFS49/logo.png" alt="Logo">
+      </div>
+      <h2>Produtos Grátis</h2>
+      <p style="color: var(--text-dim);">Gerador de chaves ilimitadas</p>
+    </div>
+
+    <div class="site-message">
+      <b>O site produto-wxt diz:</b>
+      Bem-vindo à área gratuita! Aqui você pode gerar chaves para usar em nossos bots e produtos.
+    </div>
+
+    <div class="card" style="background: var(--card-bg); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow);">
+      <p style="text-align: center; margin-bottom: 20px; color: var(--text-dim);">Clique no botão abaixo para gerar uma nova chave de acesso.</p>
+      <button id="generateBtn" onclick="generateKey()">GERAR NOVA KEY</button>
+      
+      <div id="keyDisplay" class="key-display" onclick="copyKey()"></div>
+      
+      <div id="infoBox" class="info-box">
+        <p>✅ <b>Key Gerada com Sucesso!</b></p>
+        <p style="margin-top: 10px;">Coloque a Key no arquivo <b>configuracao.js</b> da base.</p>
+        <p style="margin-top: 5px; font-size: 0.8rem; color: var(--text-dim);">Esta Key é <b>ilimitada</b> e serve para usar nos bots e produtos do wxt-produtos.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <a href="/pagamento" class="btn btn-secondary">Voltar para Pagamento</a>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2026 produto-wxt - Todos os direitos reservados.</p>
+    </div>
+  </div>
+
+  <script>
+    async function generateKey() {
+      const btn = document.getElementById('generateBtn');
+      const keyDisplay = document.getElementById('keyDisplay');
+      const infoBox = document.getElementById('infoBox');
+      
+      btn.disabled = true;
+      btn.innerText = 'Gerando...';
+      
+      try {
+        const res = await fetch('/api/generate-key');
+        const data = await res.json();
+        
+        if (data.key) {
+          keyDisplay.innerText = data.key;
+          keyDisplay.style.display = 'block';
+          infoBox.style.display = 'block';
+          btn.innerText = 'GERAR OUTRA KEY';
+        } else {
+          alert('Erro ao gerar chave.');
+        }
+      } catch (err) {
+        alert('Erro de conexão.');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function copyKey() {
+      const key = document.getElementById('keyDisplay').innerText;
+      navigator.clipboard.writeText(key).then(() => {
+        alert('Key copiada para a área de transferência!');
+      });
+    }
+  </script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>
